@@ -54,6 +54,11 @@ public class Game {
     /** Total height of the field */
     private final double fieldHeight;
 
+    /** The maximum number of wall bounces before a re-serve */
+    private final int maxWallBounces = 15;
+    /** The current number of consecutive wall bounces */
+    private int wallBounces = 0;
+
     public Game(double paddleRadius, double paddleCurvature, double paddleAcceleration, double paddleFriction,
             double paddleElasticCoefficient, double initialBallVelocity, double width, double height) {
         leftPaddleCenter = new Vector2D(wallOffset, height / 2);
@@ -90,6 +95,10 @@ public class Game {
      * @param rightMove
      */
     public void nextFrame(int leftMove, int rightMove) {
+        if (wallBounces >= maxWallBounces) {
+            wallBounces = 0;
+            serve();
+        }
         leftPaddleVelocity = acceleratePaddle(leftPaddleVelocity, leftMove);
         rightPaddleVelocity = acceleratePaddle(rightPaddleVelocity, rightMove);
         leftPaddleCenter = movePaddle(leftPaddleCenter, leftPaddleVelocity);
@@ -134,12 +143,15 @@ public class Game {
         Vector2D normal = null;
         double speedMultiplier = 1;
         if (ballPosition.getY() <= wallOffset) {
+            wallBounces++;
             normal = new Vector2D(0, -1);
         } else if (ballPosition.getY() >= fieldHeight - wallOffset) {
+            wallBounces++;
             normal = new Vector2D(0, 1);
         } else if ((ballPosition.getX() <= wallOffset)
                 && (ballPosition.getY() >= leftPaddleCenter.getY() - paddleRadius)
                 && (ballPosition.getY() <= leftPaddleCenter.getY() + paddleRadius)) {
+            wallBounces = 0;
             ballPosition = new Vector2D(wallOffset, ballPosition.getY());
             double distanceFromCenter = ballPosition.getY() - leftPaddleCenter.getY();
             speedMultiplier = paddleElasticCoefficient;
@@ -147,6 +159,7 @@ public class Game {
         } else if ((ballPosition.getX() >= fieldWidth - wallOffset)
                 && (ballPosition.getY() >= rightPaddleCenter.getY() - paddleRadius)
                 && (ballPosition.getY() <= rightPaddleCenter.getY() + paddleRadius)) {
+            wallBounces = 0;
             ballPosition = new Vector2D(fieldWidth - wallOffset, ballPosition.getY());
             double distanceFromCenter = ballPosition.getY() - rightPaddleCenter.getY();
             speedMultiplier = paddleElasticCoefficient;

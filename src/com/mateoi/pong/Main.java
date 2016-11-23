@@ -9,6 +9,16 @@ import javafx.stage.Stage;
 
 public class Main extends Application {
 
+    // Game Parameters
+    private static final int gameHeight = 300;
+    private static final int gameWidth = 500;
+    private static final double paddleSize = 25;
+    private static final double paddleCurvature = 0.02;
+    private static final double paddleAcceleration = 0.4;
+    private static final double paddleFriction = 0.2;
+    private static final double elasticCoefficient = 1.1;
+    private static final double initialVelocity = 1.8;
+
     @Override
     public void start(Stage window) {
         try {
@@ -16,9 +26,10 @@ public class Main extends Application {
             Scene scene = new Scene(root);
             window.setScene(scene);
 
-            Canvas canvas = new Canvas(500, 300);
+            Canvas canvas = new Canvas(gameWidth, gameHeight);
             root.getChildren().add(canvas);
-            Game game = new Game(25, 0.02, 0.4, 0.2, 1.1, 1.8, canvas.getWidth(), canvas.getHeight());
+            Game game = new Game(paddleSize, paddleCurvature, paddleAcceleration, paddleFriction, elasticCoefficient,
+                    initialVelocity, gameWidth, gameHeight);
             KeyboardInput in = new KeyboardInput(scene);
             Player leftPlayer = new HumanPlayer(in, KeyCode.W, KeyCode.S);
             Player rightPlayer = new HumanPlayer(in, KeyCode.UP, KeyCode.DOWN);
