@@ -21,7 +21,6 @@ public class Game {
     private Vector2D ballVelocity;
     /** Initial ball velocity */
     private final double initialBallVelocity;
-
     /** Location of the left paddle's center */
     private Vector2D leftPaddleCenter;
     /** Current velocity of the left paddle */
@@ -141,12 +140,14 @@ public class Game {
         } else if ((ballPosition.getX() <= wallOffset)
                 && (ballPosition.getY() >= leftPaddleCenter.getY() - paddleRadius)
                 && (ballPosition.getY() <= leftPaddleCenter.getY() + paddleRadius)) {
+            ballPosition = new Vector2D(wallOffset, ballPosition.getY());
             double distanceFromCenter = ballPosition.getY() - leftPaddleCenter.getY();
             speedMultiplier = paddleElasticCoefficient;
             normal = new Vector2D(1, distanceFromCenter * paddleCurvature).normalize();
         } else if ((ballPosition.getX() >= fieldWidth - wallOffset)
                 && (ballPosition.getY() >= rightPaddleCenter.getY() - paddleRadius)
                 && (ballPosition.getY() <= rightPaddleCenter.getY() + paddleRadius)) {
+            ballPosition = new Vector2D(fieldWidth - wallOffset, ballPosition.getY());
             double distanceFromCenter = ballPosition.getY() - rightPaddleCenter.getY();
             speedMultiplier = paddleElasticCoefficient;
             normal = new Vector2D(-1, distanceFromCenter * paddleCurvature).normalize();
