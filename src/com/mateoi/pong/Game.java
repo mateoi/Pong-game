@@ -12,15 +12,12 @@ import javafx.beans.property.SimpleIntegerProperty;
  */
 public class Game {
 
-    /** Offset of the walls and paddles from the edge of the field. */
-    public static final double wallOffset = 10;
-
     /** Current position of the ball */
     private Vector2D ballPosition;
     /** Current velocity of the ball */
     private Vector2D ballVelocity;
     /** Initial ball velocity */
-    private final double initialBallVelocity;
+    private final double initialBallSpeed;
     /** Location of the left paddle's center */
     private Vector2D leftPaddleCenter;
     /** Current velocity of the left paddle */
@@ -48,6 +45,8 @@ public class Game {
     private final double paddleFriction;
     /** The increase in velocity when the ball bounces off the paddle */
     private final double paddleElasticCoefficient;
+    /** How much the paddle's movement affects the ball's trajectory */
+    private final double spinFactor;
 
     /** Total width of the field */
     private final double fieldWidth;
@@ -59,20 +58,49 @@ public class Game {
     /** The current number of consecutive wall bounces */
     private int wallBounces = 0;
 
+    /**
+     * Creates a new Pong game.
+     *
+     * @param paddleRadius
+     *            The size of the paddle from the center to the edge
+     * @param paddleCurvature
+     *            How much the ball curves depending on where on the paddle the
+     *            ball hits
+     * @param paddleAcceleration
+     *            How quickly the paddle responds to input
+     * @param paddleFriction
+     *            How quickly the paddle stops moving once there is no more
+     *            input
+     * @param paddleElasticCoefficient
+     *            How much the ball bounces off the paddle. Values over 1 mean
+     *            the ball goes faster each bounce.
+     * @param spinFactor
+     *            How much the paddle's velocity affects the direction of the
+     *            ball.
+     * @param initialBallVelocity
+     *            The initial speed, in pixels per frame, of the ball when
+     *            served.
+     * @param width
+     *            The total width of the playing field
+     * @param height
+     *            The total height of the playing field.
+     */
     public Game(double paddleRadius, double paddleCurvature, double paddleAcceleration, double paddleFriction,
-            double paddleElasticCoefficient, double initialBallVelocity, double width, double height) {
-        leftPaddleCenter = new Vector2D(wallOffset, height / 2);
+            double paddleElasticCoefficient, double spinFactor, double initialBallVelocity, double width,
+            double height) {
+        leftPaddleCenter = new Vector2D(0, height / 2);
         leftPaddleVelocity = Vector2D.ZERO;
-        rightPaddleCenter = new Vector2D(width - wallOffset, height / 2);
+        rightPaddleCenter = new Vector2D(width, height / 2);
         rightPaddleVelocity = Vector2D.ZERO;
 
-        this.initialBallVelocity = initialBallVelocity;
+        initialBallSpeed = initialBallVelocity;
         this.paddleRadius = paddleRadius;
         this.paddleCurvature = paddleCurvature;
         this.paddleAcceleration = paddleAcceleration;
         this.paddleFriction = paddleFriction;
         this.paddleElasticCoefficient = paddleElasticCoefficient;
 
+        this.spinFactor = spinFactor;
         fieldWidth = width;
         fieldHeight = height;
 
@@ -85,7 +113,7 @@ public class Game {
     private void serve() {
         ballPosition = new Vector2D(fieldWidth / 2, fieldHeight / 2);
         ballVelocity = (new Vector2D(10 * Math.random() - 5, 2 * Math.random() - 1)).normalize()
-                .scalarMultiply(initialBallVelocity);
+                .scalarMultiply(initialBallSpeed);
     }
 
     /**
@@ -128,10 +156,10 @@ public class Game {
      */
     private Vector2D movePaddle(Vector2D center, Vector2D velocity) {
         Vector2D location = center.add(velocity);
-        if (location.getY() < wallOffset + paddleRadius) {
-            location = new Vector2D(center.getX(), wallOffset + paddleRadius);
-        } else if (location.getY() > fieldHeight - (wallOffset + paddleRadius)) {
-            location = new Vector2D(center.getX(), fieldHeight - (wallOffset + paddleRadius));
+        if (location.getY() < paddleRadius) {
+            location = new Vector2D(center.getX(), paddleRadius);
+        } else if (location.getY() > fieldHeight - paddleRadius) {
+            location = new Vector2D(center.getX(), fieldHeight - paddleRadius);
         }
         return location;
     }
@@ -142,28 +170,29 @@ public class Game {
     private void moveBall() {
         Vector2D normal = null;
         double speedMultiplier = 1;
-        if (ballPosition.getY() <= wallOffset) {
+        if (ballPosition.getY() <= 0) {
             wallBounces++;
             normal = new Vector2D(0, -1);
-        } else if (ballPosition.getY() >= fieldHeight - wallOffset) {
+        } else if (ballPosition.getY() >= fieldHeight) {
             wallBounces++;
             normal = new Vector2D(0, 1);
-        } else if ((ballPosition.getX() <= wallOffset)
-                && (ballPosition.getY() >= leftPaddleCenter.getY() - paddleRadius)
+        } else if ((ballPosition.getX() <= 0) && (ballPosition.getY() >= leftPaddleCenter.getY() - paddleRadius)
                 && (ballPosition.getY() <= leftPaddleCenter.getY() + paddleRadius)) {
             wallBounces = 0;
-            ballPosition = new Vector2D(wallOffset, ballPosition.getY());
+            ballPosition = new Vector2D(0, ballPosition.getY());
             double distanceFromCenter = ballPosition.getY() - leftPaddleCenter.getY();
+            double spin = leftPaddleVelocity.getY() * spinFactor;
             speedMultiplier = paddleElasticCoefficient;
-            normal = new Vector2D(1, distanceFromCenter * paddleCurvature).normalize();
-        } else if ((ballPosition.getX() >= fieldWidth - wallOffset)
+            normal = new Vector2D(1, distanceFromCenter * paddleCurvature + spin).normalize();
+        } else if ((ballPosition.getX() >= fieldWidth)
                 && (ballPosition.getY() >= rightPaddleCenter.getY() - paddleRadius)
                 && (ballPosition.getY() <= rightPaddleCenter.getY() + paddleRadius)) {
             wallBounces = 0;
-            ballPosition = new Vector2D(fieldWidth - wallOffset, ballPosition.getY());
+            ballPosition = new Vector2D(fieldWidth, ballPosition.getY());
             double distanceFromCenter = ballPosition.getY() - rightPaddleCenter.getY();
+            double spin = rightPaddleVelocity.getY() * spinFactor;
             speedMultiplier = paddleElasticCoefficient;
-            normal = new Vector2D(-1, distanceFromCenter * paddleCurvature).normalize();
+            normal = new Vector2D(-1, distanceFromCenter * paddleCurvature + spin).normalize();
         }
         if (normal != null) {
             ballVelocity = reflect(ballVelocity, normal);

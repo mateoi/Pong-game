@@ -35,7 +35,9 @@ public class GameController {
     /** Score to win the game */
     private int winningScore = 10;
     /** How thick to draw the lines on screen */
-    private int lineThickness = 3;
+    private final int lineThickness;
+    /** Offset between the canvas edge and the game edge */
+    private final int wallOffset;
 
     /**
      * Creates a new controller that will play the game getting moves from both
@@ -45,12 +47,17 @@ public class GameController {
      * @param canvas
      * @param leftPlayer
      * @param rightPlayer
+     * @param linethickness
+     * @param wallOffset
      */
-    public GameController(Game game, Canvas canvas, Player leftPlayer, Player rightPlayer) {
+    public GameController(Game game, Canvas canvas, Player leftPlayer, Player rightPlayer, int wallOffset,
+            int linethickness) {
         this.game = game;
         this.canvas = canvas;
         this.leftPlayer = leftPlayer;
         this.rightPlayer = rightPlayer;
+        lineThickness = linethickness;
+        this.wallOffset = wallOffset;
         gc = canvas.getGraphicsContext2D();
         gc.setFont(Font.font("monospace", FontWeight.BOLD, 15));
         done.addListener((a, b, done) -> {
@@ -86,9 +93,9 @@ public class GameController {
             gc.setFill(Color.WHITE);
             drawPaddles(game.getLeftPaddleCenter(), game.getRightPaddleCenter(), game.getPaddleRadius(),
                     game.getFieldWidth());
-            drawWalls(Game.wallOffset, game.getFieldWidth(), game.getFieldHeight());
+            drawWalls(canvas.getWidth(), canvas.getHeight());
             drawBall(game.getBallPosition());
-            drawScores(game.getLeftScore(), game.getRightScore(), game.getFieldWidth() / 2);
+            drawScores(game.getLeftScore(), game.getRightScore(), canvas.getWidth() / 2);
         }
 
         /**
@@ -109,8 +116,8 @@ public class GameController {
          * @param ballPosition
          */
         private void drawBall(Vector2D ballPosition) {
-            double x = ballPosition.getX();
-            double y = ballPosition.getY();
+            double x = ballPosition.getX() + wallOffset;
+            double y = ballPosition.getY() + wallOffset;
             gc.fillRect(x - lineThickness / 2, y - lineThickness / 2, lineThickness, lineThickness);
         }
 
@@ -121,9 +128,9 @@ public class GameController {
          * @param width
          * @param height
          */
-        private void drawWalls(double walloffset, double width, double height) {
-            gc.fillRect(0, walloffset - lineThickness, width, lineThickness);
-            gc.fillRect(0, height - walloffset, width, lineThickness);
+        private void drawWalls(double width, double height) {
+            gc.fillRect(0, wallOffset - lineThickness, width, lineThickness);
+            gc.fillRect(0, height - wallOffset, width, lineThickness);
         }
 
         /**
@@ -136,10 +143,10 @@ public class GameController {
          */
         private void drawPaddles(Vector2D leftPaddleCenter, Vector2D rightPaddleCenter, double paddleRadius,
                 double width) {
-            double lx = leftPaddleCenter.getX();
-            double ly = leftPaddleCenter.getY();
-            double rx = rightPaddleCenter.getX();
-            double ry = rightPaddleCenter.getY();
+            double lx = leftPaddleCenter.getX() + wallOffset;
+            double ly = leftPaddleCenter.getY() + wallOffset;
+            double rx = rightPaddleCenter.getX() + wallOffset;
+            double ry = rightPaddleCenter.getY() + wallOffset;
 
             gc.fillRect(lx - lineThickness, ly - paddleRadius, lineThickness, 2 * paddleRadius);
             gc.fillRect(rx, ry - paddleRadius, lineThickness, 2 * paddleRadius);

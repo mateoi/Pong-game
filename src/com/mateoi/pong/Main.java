@@ -16,8 +16,13 @@ public class Main extends Application {
     private static final double paddleCurvature = 0.02;
     private static final double paddleAcceleration = 0.4;
     private static final double paddleFriction = 0.2;
+    private static final double spinFactor = 0.05;
     private static final double elasticCoefficient = 1.1;
-    private static final double initialVelocity = 1.8;
+    private static final double initialSpeed = 1.8;
+
+    // Graphical Parameters
+    private static final int wallOffset = 10;
+    private static final int lineThickness = 3;
 
     @Override
     public void start(Stage window) {
@@ -26,14 +31,15 @@ public class Main extends Application {
             Scene scene = new Scene(root);
             window.setScene(scene);
 
-            Canvas canvas = new Canvas(gameWidth, gameHeight);
+            Canvas canvas = new Canvas(gameWidth + 2 * wallOffset, gameHeight + 2 * wallOffset);
             root.getChildren().add(canvas);
             Game game = new Game(paddleSize, paddleCurvature, paddleAcceleration, paddleFriction, elasticCoefficient,
-                    initialVelocity, gameWidth, gameHeight);
+                    spinFactor, initialSpeed, gameWidth, gameHeight);
             KeyboardInput in = new KeyboardInput(scene);
             Player leftPlayer = new HumanPlayer(in, KeyCode.W, KeyCode.S);
             Player rightPlayer = new HumanPlayer(in, KeyCode.UP, KeyCode.DOWN);
-            GameController controller = new GameController(game, canvas, leftPlayer, rightPlayer);
+            GameController controller = new GameController(game, canvas, leftPlayer, rightPlayer, wallOffset,
+                    lineThickness);
             window.show();
             controller.playGame();
         } catch (Exception e) {
