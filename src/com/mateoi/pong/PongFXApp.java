@@ -11,16 +11,7 @@ import javafx.stage.Stage;
 
 public class PongFXApp extends Application {
 
-    // Default Game Parameters
-    private static int gameHeight = 300;
-    private static int gameWidth = 500;
-    private static double paddleSize = 25;
-    private static double paddleCurvature = 0.02;
-    private static double paddleAcceleration = 0.4;
-    private static double paddleFriction = 0.2;
-    private static double spinFactor = 0.05;
-    private static double elasticCoefficient = 1.1;
-    private static double initialSpeed = 1.8;
+    private static PongGame game;
 
     // Graphics Parameters
     private static int wallOffset = 10;
@@ -47,10 +38,8 @@ public class PongFXApp extends Application {
             Scene scene = new Scene(root);
             window.setScene(scene);
             addSceneListeners(scene);
-            Canvas canvas = new Canvas(gameWidth + 2 * wallOffset, gameHeight + 2 * wallOffset);
+            Canvas canvas = new Canvas(game.getFieldWidth() + 2 * wallOffset, game.getFieldHeight() + 2 * wallOffset);
             root.getChildren().add(canvas);
-            PongGame game = new PongGame(paddleSize, paddleCurvature, paddleAcceleration, paddleFriction,
-                    elasticCoefficient, spinFactor, initialSpeed, gameWidth, gameHeight);
             PongController controller = new PongController(game, canvas, leftPlayer, rightPlayer, wallOffset,
                     lineThickness);
             window.show();
@@ -70,40 +59,13 @@ public class PongFXApp extends Application {
 
     }
 
-    public static void setGameHeight(int gameHeight) {
-        PongFXApp.gameHeight = gameHeight;
+    public static void setGame(PongGame game) {
+        PongFXApp.game = game;
     }
 
-    public static void setGameWidth(int gameWidth) {
-        PongFXApp.gameWidth = gameWidth;
-    }
-
-    public static void setPaddleSize(double paddleSize) {
-        PongFXApp.paddleSize = paddleSize;
-    }
-
-    public static void setPaddleCurvature(double paddleCurvature) {
-        PongFXApp.paddleCurvature = paddleCurvature;
-    }
-
-    public static void setPaddleAcceleration(double paddleAcceleration) {
-        PongFXApp.paddleAcceleration = paddleAcceleration;
-    }
-
-    public static void setPaddleFriction(double paddleFriction) {
-        PongFXApp.paddleFriction = paddleFriction;
-    }
-
-    public static void setSpinFactor(double spinFactor) {
-        PongFXApp.spinFactor = spinFactor;
-    }
-
-    public static void setElasticCoefficient(double elasticCoefficient) {
-        PongFXApp.elasticCoefficient = elasticCoefficient;
-    }
-
-    public static void setInitialSpeed(double initialSpeed) {
-        PongFXApp.initialSpeed = initialSpeed;
+    public static void setPlayers(Player leftPlayer, Player rightPlayer) {
+        PongFXApp.leftPlayer = leftPlayer;
+        PongFXApp.rightPlayer = rightPlayer;
     }
 
     public static void setWallOffset(int wallOffset) {
@@ -114,8 +76,4 @@ public class PongFXApp extends Application {
         PongFXApp.lineThickness = lineThickness;
     }
 
-    public static void setPlayers(Player leftPlayer, Player rightPlayer) {
-        PongFXApp.leftPlayer = leftPlayer;
-        PongFXApp.rightPlayer = rightPlayer;
-    }
 }

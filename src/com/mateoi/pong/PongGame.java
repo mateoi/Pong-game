@@ -17,7 +17,7 @@ public class PongGame {
     /** Current velocity of the ball */
     private Vector2D ballVelocity;
     /** Initial ball velocity */
-    private final double initialBallSpeed;
+    private double initialBallSpeed = 1.8;
     /** Location of the left paddle's center */
     private Vector2D leftPaddleCenter;
     /** Current velocity of the left paddle */
@@ -33,25 +33,25 @@ public class PongGame {
     private IntegerProperty rightScore = new SimpleIntegerProperty(0);
 
     /** How far the paddle extends from the center */
-    private final double paddleRadius;
+    private double paddleRadius = 25;
     /**
      * How much the paddle curves - this matters for bouncing and accelerating
      * the ball
      */
-    private final double paddleCurvature;
+    private double paddleCurvature = 0.02;
     /** How fast the paddle accelerates when under user input */
-    private final double paddleAcceleration;
+    private double paddleAcceleration = 0.4;
     /** How quickly the paddle slows down when there is no user input */
-    private final double paddleFriction;
+    private double paddleFriction = 0.2;
     /** The increase in velocity when the ball bounces off the paddle */
-    private final double paddleElasticCoefficient;
+    private double paddleElasticCoefficient = 1.1;
     /** How much the paddle's movement affects the ball's trajectory */
-    private final double spinFactor;
+    private double spinFactor = 0.02;
 
     /** Total width of the field */
-    private final double fieldWidth;
+    private double fieldWidth;
     /** Total height of the field */
-    private final double fieldHeight;
+    private double fieldHeight;
 
     /** The maximum number of wall bounces before a re-serve */
     private final int maxWallBounces = 15;
@@ -85,22 +85,12 @@ public class PongGame {
      * @param height
      *            The total height of the playing field.
      */
-    public PongGame(double paddleRadius, double paddleCurvature, double paddleAcceleration, double paddleFriction,
-            double paddleElasticCoefficient, double spinFactor, double initialBallVelocity, double width,
-            double height) {
+    public PongGame(double width, double height) {
         leftPaddleCenter = new Vector2D(0, height / 2);
         leftPaddleVelocity = Vector2D.ZERO;
         rightPaddleCenter = new Vector2D(width, height / 2);
         rightPaddleVelocity = Vector2D.ZERO;
 
-        initialBallSpeed = initialBallVelocity;
-        this.paddleRadius = paddleRadius;
-        this.paddleCurvature = paddleCurvature;
-        this.paddleAcceleration = paddleAcceleration;
-        this.paddleFriction = paddleFriction;
-        this.paddleElasticCoefficient = paddleElasticCoefficient;
-
-        this.spinFactor = spinFactor;
         fieldWidth = width;
         fieldHeight = height;
 
@@ -127,8 +117,8 @@ public class PongGame {
             wallBounces = 0;
             serve();
         }
-        leftPaddleVelocity = acceleratePaddle(leftPaddleVelocity, leftMove);
-        rightPaddleVelocity = acceleratePaddle(rightPaddleVelocity, rightMove);
+        leftPaddleVelocity = acceleratePaddle(leftPaddleVelocity, leftPaddleCenter, leftMove);
+        rightPaddleVelocity = acceleratePaddle(rightPaddleVelocity, rightPaddleCenter, rightMove);
         leftPaddleCenter = movePaddle(leftPaddleCenter, leftPaddleVelocity);
         rightPaddleCenter = movePaddle(rightPaddleCenter, rightPaddleVelocity);
         moveBall();
@@ -142,8 +132,10 @@ public class PongGame {
      * @param isRightPaddle
      * @param move
      */
-    private Vector2D acceleratePaddle(Vector2D velocity, int move) {
-        if (move == 0) {
+    private Vector2D acceleratePaddle(Vector2D velocity, Vector2D position, int move) {
+        boolean atBorder = position.getY() <= paddleRadius && move == -1
+                || position.getY() >= fieldHeight - paddleRadius && move == 1;
+        if (move == 0 || atBorder) {
             return velocity.scalarMultiply(1 - paddleFriction);
         } else {
             Vector2D deltaV = new Vector2D(0, move * paddleAcceleration);
@@ -279,6 +271,42 @@ public class PongGame {
 
     public double getFieldHeight() {
         return fieldHeight;
+    }
+
+    public void setHeight(int gameHeight) {
+        fieldHeight = gameHeight;
+    }
+
+    public void setWidth(int gameWidth) {
+        fieldWidth = gameWidth;
+    }
+
+    public void setPaddleSize(double paddleSize) {
+        paddleRadius = paddleSize;
+    }
+
+    public void setPaddleCurvature(double paddleCurvature) {
+        this.paddleCurvature = paddleCurvature;
+    }
+
+    public void setPaddleAcceleration(double paddleAcceleration) {
+        this.paddleAcceleration = paddleAcceleration;
+    }
+
+    public void setPaddleFriction(double paddleFriction) {
+        this.paddleFriction = paddleFriction;
+    }
+
+    public void setSpinFactor(double spinFactor) {
+        this.spinFactor = spinFactor;
+    }
+
+    public void setElasticCoefficient(double elasticCoefficient) {
+        paddleElasticCoefficient = elasticCoefficient;
+    }
+
+    public void setInitialSpeed(double initialSpeed) {
+        initialBallSpeed = initialSpeed;
     }
 
 }
