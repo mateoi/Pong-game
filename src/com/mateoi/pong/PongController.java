@@ -16,10 +16,10 @@ import javafx.scene.text.FontWeight;
  *
  * @author mateo
  */
-public class GameController {
+public class PongController {
 
     /** The game that's being played */
-    private Game game;
+    private PongGame game;
     /** The canvas to draw the game on */
     private Canvas canvas;
     /** Context used to draw on the canvas */
@@ -50,7 +50,7 @@ public class GameController {
      * @param linethickness
      * @param wallOffset
      */
-    public GameController(Game game, Canvas canvas, Player leftPlayer, Player rightPlayer, int wallOffset,
+    public PongController(PongGame game, Canvas canvas, Player leftPlayer, Player rightPlayer, int wallOffset,
             int linethickness) {
         this.game = game;
         this.canvas = canvas;

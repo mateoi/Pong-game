@@ -13,5 +13,5 @@ public interface Player {
      * @param state
      * @return The move to perform
      */
-    public int move(Game state);
+    public int move(PongGame state);
 }

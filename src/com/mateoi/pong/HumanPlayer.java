@@ -8,17 +8,14 @@ import javafx.scene.input.KeyCode;
  * @author mateo
  */
 public class HumanPlayer implements Player {
-    /** Input object to get the values from */
-    private final KeyboardInput input;
     /** Key to use to move the paddle up */
     private final KeyCode up;
     /** Key to use to move the paddle down */
     private final KeyCode down;
 
-    public HumanPlayer(KeyboardInput input, KeyCode up, KeyCode down) {
+    public HumanPlayer(KeyCode up, KeyCode down) {
         this.up = up;
         this.down = down;
-        this.input = input;
     }
 
     /**
@@ -27,12 +24,12 @@ public class HumanPlayer implements Player {
      * be anything.
      */
     @Override
-    public int move(Game state) {
+    public int move(PongGame state) {
         int move = 0;
-        if (input.contains(down)) {
+        if (PongFXApp.keyPressed(down)) {
             move++;
         }
-        if (input.contains(up)) {
+        if (PongFXApp.keyPressed(up)) {
             move--;
         }
         return move;

@@ -10,7 +10,7 @@ import javafx.beans.property.SimpleIntegerProperty;
  *
  * @author mateo
  */
-public class Game {
+public class PongGame {
 
     /** Current position of the ball */
     private Vector2D ballPosition;
@@ -85,7 +85,7 @@ public class Game {
      * @param height
      *            The total height of the playing field.
      */
-    public Game(double paddleRadius, double paddleCurvature, double paddleAcceleration, double paddleFriction,
+    public PongGame(double paddleRadius, double paddleCurvature, double paddleAcceleration, double paddleFriction,
             double paddleElasticCoefficient, double spinFactor, double initialBallVelocity, double width,
             double height) {
         leftPaddleCenter = new Vector2D(0, height / 2);
