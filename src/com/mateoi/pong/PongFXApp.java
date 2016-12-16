@@ -56,7 +56,6 @@ public class PongFXApp extends Application {
             }
         });
         scene.setOnKeyReleased(e -> input.remove(e.getCode()));
-
     }
 
     public static void setGame(PongGame game) {
