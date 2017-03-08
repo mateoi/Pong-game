@@ -9,8 +9,15 @@ import javafx.scene.canvas.Canvas;
 import javafx.scene.input.KeyCode;
 import javafx.stage.Stage;
 
+/**
+ * This class is the FX application that gets rendered on screen.
+ *
+ * @author mateo
+ *
+ */
 public class PongFXApp extends Application {
 
+    /** The game to play */
     private static PongGame game;
 
     // Graphics Parameters
@@ -27,6 +34,12 @@ public class PongFXApp extends Application {
         // Nothing here
     }
 
+    /**
+     * Checks if the given {@link KeyCode} is pressed.
+     *
+     * @param code
+     * @return
+     */
     public static boolean keyPressed(KeyCode code) {
         return input.contains(code);
     }
@@ -49,6 +62,11 @@ public class PongFXApp extends Application {
         }
     }
 
+    /**
+     * Adds keyboard listeners to the given scene.
+     *
+     * @param scene
+     */
     private static void addSceneListeners(Scene scene) {
         scene.setOnKeyPressed(e -> {
             if (!input.contains(e.getCode())) {
@@ -58,19 +76,42 @@ public class PongFXApp extends Application {
         scene.setOnKeyReleased(e -> input.remove(e.getCode()));
     }
 
+    /**
+     * Set the state of the game
+     *
+     * @param game
+     */
     public static void setGame(PongGame game) {
         PongFXApp.game = game;
     }
 
+    /**
+     * Set the players that will play the game
+     *
+     * @param leftPlayer
+     * @param rightPlayer
+     */
     public static void setPlayers(Player leftPlayer, Player rightPlayer) {
         PongFXApp.leftPlayer = leftPlayer;
         PongFXApp.rightPlayer = rightPlayer;
     }
 
+    /**
+     * Sets the graphical offset between the edge of the playing area and the
+     * edge of the drawing canvas. Has no effect on gameplay, just graphics.
+     *
+     * @param wallOffset
+     */
     public static void setWallOffset(int wallOffset) {
         PongFXApp.wallOffset = wallOffset;
     }
 
+    /**
+     * Set the thickness of the lines in the game. Has no effect on gameplay,
+     * just graphics.
+     * 
+     * @param lineThickness
+     */
     public static void setLineThickness(int lineThickness) {
         PongFXApp.lineThickness = lineThickness;
     }

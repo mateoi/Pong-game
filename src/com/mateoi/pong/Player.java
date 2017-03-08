@@ -6,8 +6,9 @@ package com.mateoi.pong;
  * @author mateo
  */
 public interface Player {
+
     /**
-     * Returns a move (-1 and 1 for left and right, 0 for no input) given a game
+     * Returns a move (-1 and 1 for down and up, 0 for no input) given a game
      * state to analyze.
      *
      * @param state

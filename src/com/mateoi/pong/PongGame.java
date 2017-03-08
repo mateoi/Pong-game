@@ -75,25 +75,6 @@ public class PongGame {
     /**
      * Creates a new Pong game.
      *
-     * @param paddleRadius
-     *            The size of the paddle from the center to the edge
-     * @param paddleCurvature
-     *            How much the ball curves depending on where on the paddle the
-     *            ball hits
-     * @param paddleAcceleration
-     *            How quickly the paddle responds to input
-     * @param paddleFriction
-     *            How quickly the paddle stops moving once there is no more
-     *            input
-     * @param paddleElasticCoefficient
-     *            How much the ball bounces off the paddle. Values over 1 mean
-     *            the ball goes faster each bounce.
-     * @param spinFactor
-     *            How much the paddle's velocity affects the direction of the
-     *            ball.
-     * @param initialBallVelocity
-     *            The initial speed, in pixels per frame, of the ball when
-     *            served.
      * @param width
      *            The total width of the playing field
      * @param height
@@ -122,12 +103,13 @@ public class PongGame {
     }
 
     /**
-     * Updates the game state by one frame given the players' inputs
+     * Updates the game state by one frame given the players' inputs.
      *
      * @param leftMove
      * @param rightMove
      */
     public void nextFrame(int leftMove, int rightMove) {
+        // To prevent bouncing around forever
         if (wallBounces >= maxWallBounces) {
             deadBalls++;
             wallBounces = 0;
@@ -145,22 +127,28 @@ public class PongGame {
      * Changes a paddle's velocity given the user's move, and what paddle is
      * meant to move.
      *
-     * @param isRightPaddle
+     * @param velocity
+     * @param position
      * @param move
+     * @return
      */
     private Vector2D acceleratePaddle(Vector2D velocity, Vector2D position, int move) {
-        final boolean atBorder = position.getY() <= paddleRadius && move == -1
+        boolean atBorder = position.getY() <= paddleRadius && move == -1
                 || position.getY() >= fieldHeight - paddleRadius && move == 1;
         if (move == 0 || atBorder) {
             return velocity.scalarMultiply(1 - paddleFriction);
         } else {
-            final Vector2D deltaV = new Vector2D(0, move * paddleAcceleration);
+            Vector2D deltaV = new Vector2D(0, move * paddleAcceleration);
             return velocity.add(deltaV);
         }
     }
 
     /**
      * Moves paddles and clips their location.
+     *
+     * @param center
+     * @param velocity
+     * @return
      */
     private Vector2D movePaddle(Vector2D center, Vector2D velocity) {
         Vector2D location = center.add(velocity);
@@ -246,110 +234,199 @@ public class PongGame {
         }
     }
 
+    /**
+     * @return The left player's score.
+     */
     public int getLeftScore() {
         return leftScore.get();
     }
 
+    /**
+     * @return The right player's score.
+     */
     public int getRightScore() {
         return rightScore.get();
     }
 
+    /**
+     * @return A Property containing the left player's score.
+     */
     public IntegerProperty leftScoreProperty() {
         return leftScore;
     }
 
+    /**
+     * @return A Property containing the right player's score.
+     */
     public IntegerProperty rightScoreProperty() {
         return rightScore;
     }
 
+    /**
+     * @return A {@link Vector2D} representing the ball's current position.
+     */
     public Vector2D getBallPosition() {
         return ballPosition;
     }
 
+    /**
+     * @return A {@link Vector2D} representing the ball's current velocity.
+     */
     public Vector2D getBallVelocity() {
         return ballVelocity;
     }
 
+    /**
+     * @return A {@link Vector2D} representing the left paddle's current
+     *         position.
+     */
     public Vector2D getLeftPaddleCenter() {
         return leftPaddleCenter;
     }
 
+    /**
+     * @return A {@link Vector2D} representing the left paddle's current
+     *         velocity.
+     */
     public Vector2D getLeftPaddleVelocity() {
         return leftPaddleVelocity;
     }
 
+    /**
+     * @return A {@link Vector2D} representing the right paddle's current
+     *         position.
+     */
     public Vector2D getRightPaddleCenter() {
         return rightPaddleCenter;
     }
 
+    /**
+     * @return A {@link Vector2D} representing the right paddle's current
+     *         velocity.
+     */
     public Vector2D getRightPaddleVelocity() {
         return rightPaddleVelocity;
     }
 
+    /**
+     * @return The size of a paddle, from the center to the edge.
+     */
     public double getPaddleRadius() {
         return paddleRadius;
     }
 
+    /**
+     * @return The total width of the play area.
+     */
     public double getFieldWidth() {
         return fieldWidth;
     }
 
+    /**
+     * @return The total height of the play area.
+     */
     public double getFieldHeight() {
         return fieldHeight;
     }
 
-    public void setHeight(int gameHeight) {
-        fieldHeight = gameHeight;
-    }
-
-    public void setWidth(int gameWidth) {
-        fieldWidth = gameWidth;
-    }
-
-    public void setPaddleSize(double paddleSize) {
+    /**
+     * Set the size of the game paddle
+     *
+     * @param paddleSize
+     */
+    public void setPaddleRadius(double paddleSize) {
         paddleRadius = paddleSize;
     }
 
+    /**
+     * Change the amount by which the paddle curves and deflects a ball by.
+     *
+     * @param paddleCurvature
+     */
     public void setPaddleCurvature(double paddleCurvature) {
         this.paddleCurvature = paddleCurvature;
     }
 
+    /**
+     * SEt the rate at which the paddle responds to player input.
+     *
+     * @param paddleAcceleration
+     */
     public void setPaddleAcceleration(double paddleAcceleration) {
         this.paddleAcceleration = paddleAcceleration;
     }
 
+    /**
+     * Set the rate at which the paddle slows down when there is no input
+     * applied.
+     *
+     * @param paddleFriction
+     */
     public void setPaddleFriction(double paddleFriction) {
         this.paddleFriction = paddleFriction;
     }
 
+    /**
+     * Set how much the paddle's movement affects the trajectory of a bouncing
+     * ball.
+     *
+     * @param spinFactor
+     */
     public void setSpinFactor(double spinFactor) {
         this.spinFactor = spinFactor;
     }
 
+    /**
+     * Set the speed increase of the ball when it bounces with the paddle.
+     *
+     * @param elasticCoefficient
+     */
     public void setElasticCoefficient(double elasticCoefficient) {
         paddleElasticCoefficient = elasticCoefficient;
     }
 
+    /**
+     * Set the initial speed of the ball when served.
+     *
+     * @param initialSpeed
+     */
     public void setInitialSpeed(double initialSpeed) {
         initialBallSpeed = initialSpeed;
     }
 
+    /**
+     * @return The longest series of paddle hits without a point scored or a
+     *         ball declared dead..
+     */
     public int getLongestRally() {
         return longestRally;
     }
 
+    /**
+     * @return The number of balls that were declared dead because they took too
+     *         long to reach the opponent.
+     */
     public int getDeadBalls() {
         return deadBalls;
     }
 
+    /**
+     * @return The average number of balls returned per point
+     */
     public double getAverageRally() {
         return totalPaddleHits / (leftScore.get() + rightScore.get());
     }
 
+    /**
+     * @return The number of times the left player has hit the ball
+     */
     public int getLeftHits() {
         return leftHits;
     }
 
+    /**
+     * @return The number of times the right player has hit the ball
+     */
     public int getRightHits() {
         return rightHits;
     }
